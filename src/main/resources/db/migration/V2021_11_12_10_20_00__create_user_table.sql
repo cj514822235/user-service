@@ -1,5 +1,6 @@
 CREATE TABLE `user_table` (
-  `id`          int(11)     NOT NULL PRIMARY KEY,
+  `id`          int(11)     NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_id`     varchar(36) NOT NULL ,
   `age`         int         NOT NULL ,
   `name`        varchar(36) NOT NULL,
   `cellphone`   varchar(36) NOT NULL ,
