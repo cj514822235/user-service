@@ -1,5 +1,7 @@
 package com.tw.userservice.modle;
 
+
+
 public enum Level {
 
         EASY("suitable for beginners"),
@@ -10,10 +12,10 @@ public enum Level {
         private final String description;
 
         Level(String description) {
-            this.description = description;
-        }
-        public String getDescription() {
-            return description;
+                this.description = description;
         }
 
+        public String getDescription() {
+                return description;
+        }
 }

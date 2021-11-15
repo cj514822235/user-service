@@ -1,6 +1,7 @@
 package com.tw.userservice.modle;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,24 +31,26 @@ import java.util.List;
 public class User {
     @Id
     @Column(name = "id", nullable = false)
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "user_id")
     private String userId;
 
+    @Column(name = "status")
+    private Boolean status;
+
     private String name;
 
-    private int age;
+    private String role;
+
+    private Integer age;
 
     private String cellphone;
 
     private String address;
 
     private String email;
-
-    @OneToMany(targetEntity = Task.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private List<Task> tasks;
 
 }
