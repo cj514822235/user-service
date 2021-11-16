@@ -7,7 +7,11 @@ CREATE TABLE `user_table` (
   `name`        varchar(36) NOT NULL,
   `cellphone`   varchar(36) NOT NULL ,
   `address`     varchar(36) NOT NULL ,
-  `email`       varchar(36) NOT NULL
+  `email`       varchar(36) NOT NULL,
+  `created_at`      datetime    NOT NULL,
+  `updated_at`      datetime    NOT NULL,
+  `version`         int(11)     NOT NULL
+
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;

@@ -1,5 +1,6 @@
 package com.tw.userservice.service;
 
+import com.tw.userservice.exception.UserNotFoundException;
 import com.tw.userservice.modle.ChangeUserInfo;
 import com.tw.userservice.modle.Task;
 import com.tw.userservice.modle.User;
@@ -12,11 +13,13 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Optional;
 
 
 @Service
 public class UserService {
+
+    public static final String USER_NOT_FOUND = "User Not found";
 
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
@@ -39,7 +42,8 @@ public class UserService {
 
 
     public UserDetails findByUserId(String userId){
-        User user =  userRepository.findUserByUserId(userId);
+        User user =  Optional.ofNullable(userRepository.findUserByUserId(userId))
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
         if(user.getStatus()) {
             return UserDetails.builder()
                     .userId(user.getUserId())
@@ -50,7 +54,8 @@ public class UserService {
                     .name(user.getName())
                     .build();
         }
-            return null;
+
+         throw new UserNotFoundException(USER_NOT_FOUND);
     }
 
 
@@ -61,7 +66,8 @@ public class UserService {
 
 
     public List<UserDetails> findAllUsers() {
-        List<User> userList = userRepository.findAll();
+        List<User> userList = Optional.ofNullable(userRepository.findAll())
+                .orElseThrow(()->new UserNotFoundException("Empty"));
         List<UserDetails> userDetails = new ArrayList<>();
 
         for (User user : userList) {
@@ -79,7 +85,8 @@ public class UserService {
 
 
     public void updateUserInfo(String userId, ChangeUserInfo changeUserInfo) {
-        User user = userRepository.findUserByUserId(userId);
+        User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
         if(user.getStatus()) {
             if (changeUserInfo.getAge() != null) {
                 user.setAge(changeUserInfo.getAge());
@@ -95,10 +102,12 @@ public class UserService {
             }
             userRepository.save(user);
         }
+        throw new UserNotFoundException(USER_NOT_FOUND);
     }
 
     public String deleteUserInfo(String userId) {
-        User user = userRepository.findUserByUserId(userId);
+        User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
         if(user.getStatus()) {
             user.setStatus(false);
 
@@ -109,7 +118,7 @@ public class UserService {
            userRepository.save(user);
             return "successfully delete";
         }
-        return "Not found";
+        throw new UserNotFoundException(USER_NOT_FOUND);
     }
 
 }

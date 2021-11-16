@@ -34,6 +34,7 @@ public class UserController {
        return userService.createUser(user);
     }
 
+
     @GetMapping("/{userId}")
     public UserDetails findByUserId (@PathVariable(value = "userId") String userId){
         return userService.findByUserId(userId);
@@ -43,6 +44,7 @@ public class UserController {
     public List<UserDetails> findAllUsers(){
         return userService.findAllUsers();
     }
+
 
     @PostMapping("/{userId}/updateInfo")
     public void updateUserInfo(@PathVariable(value = "userId")String userId,

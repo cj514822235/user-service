@@ -24,13 +24,14 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Task {
+public class Task extends EntityBase {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private Long id;
 
+    @JsonIgnore
     private Boolean status;
 
     @Enumerated(EnumType.STRING)

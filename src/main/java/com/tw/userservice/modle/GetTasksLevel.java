@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetLevelTasks {
-
+public class GetTasksLevel {
     private Level level;
 }

@@ -1,7 +1,9 @@
 package com.tw.userservice.service;
 
 
-import com.tw.userservice.modle.GetLevelTasks;
+import com.tw.userservice.exception.TaskNotFoundException;
+import com.tw.userservice.exception.UserNotFoundException;
+import com.tw.userservice.modle.GetTasksLevel;
 import com.tw.userservice.modle.Task;
 import com.tw.userservice.modle.User;
 import com.tw.userservice.repository.TaskRepository;
@@ -9,6 +11,7 @@ import com.tw.userservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,37 +28,58 @@ public class TaskService {
 
     public String createTasks(String userId, List<Task> tasks) {
 
-        User user = userRepository.findUserByUserId(userId);
-        if(user.getStatus()) {
-            tasks.forEach(task -> {
-                task.setStatus(true);
-                task.setUser(user);
-            });
-            taskRepository.saveAll(tasks);
-            return userId;
-        }
-        return "user not found";
+        User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+
+        tasks.forEach(task -> {
+            task.setStatus(true);
+            task.setUser(user);
+        });
+        taskRepository.saveAll(tasks);
+        return userId;
     }
 
 
     public List<Task> getTasksForUser(String  userId){
-        User user = userRepository.findUserByUserId(userId);
-        return taskRepository.findTasksByUserId(user.getId());
+        User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+
+        if(user.getStatus()) {
+            if(taskRepository.findTasksByUserId(user.getId()).isEmpty()){
+                throw new TaskNotFoundException("Task Not Found");
+            }
+            return taskRepository.findTasksByUserId(user.getId()).stream()
+                    .filter(task -> task.getStatus().equals(true)).collect(Collectors.toList());
+        }
+        throw new UserNotFoundException("User Not Found");
     }
 
 
-    public List<Task> getTasksByStatus(String userId, GetLevelTasks level) {
+    public List<Task> getTasksByStatus(String userId, GetTasksLevel level) {
 
-        User user = userRepository.findUserByUserId(userId);
-        List<Task> tasks = taskRepository.findTasksByUserId(user.getId());
-        return tasks.stream().filter(task -> task.getLevel().equals(level.getLevel())).collect(Collectors.toList());
+        User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+
+        if (user.getStatus()){
+            List<Task> tasks = taskRepository.findTasksByUserId(user.getId());
+            if(tasks.isEmpty()){
+                throw new TaskNotFoundException("Task Not Found");
+            }
+            return tasks.stream().filter(task -> task.getLevel().equals(level.getLevel())).collect(Collectors.toList());
+        }
+        throw new UserNotFoundException("User Not found");
     }
 
 
     public String deleteTaskById(String userId, Long id) {
-        User user = userRepository.findUserByUserId(userId);
+        User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+
         if(user.getStatus()) {
             List<Task> tasks = taskRepository.findTasksByUserId(user.getId());
+            if(tasks.isEmpty()){
+                throw new TaskNotFoundException("Task Not Found");
+            }
             for (Task task : tasks) {
                 if (task.getId().equals(id) && task.getStatus().equals(true)) {
                     task.setStatus(false);
@@ -63,8 +87,8 @@ public class TaskService {
                     return "successfully delete";
                 }
             }
-            return "task not found";
+            throw new TaskNotFoundException("Task Not Found");
         }
-        return "user not found";
+        throw new UserNotFoundException("User Not found");
     }
 }

@@ -1,9 +1,7 @@
 package com.tw.userservice.web;
 
-import com.tw.userservice.modle.GetLevelTasks;
-import com.tw.userservice.modle.Level;
+import com.tw.userservice.modle.GetTasksLevel;
 import com.tw.userservice.modle.Task;
-import com.tw.userservice.modle.User;
 import com.tw.userservice.service.TaskService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,14 +27,14 @@ public class TaskController {
        return taskService.createTasks(userId,tasks);
     }
 
-    @GetMapping("{userId}/")
+    @GetMapping("{userId}")
     public List<Task> getTasksForUser(@PathVariable("userId") String userId){
 
         return taskService.getTasksForUser(userId);
     }
 
     @GetMapping("{userId}/status")
-    public List<Task> getTaskByStatus(@PathVariable("userId") String userId, @RequestBody GetLevelTasks level){
+    public List<Task> getTaskByStatus(@PathVariable("userId") String userId, @RequestBody GetTasksLevel level){
         return taskService.getTasksByStatus(userId,level);
     }
 
