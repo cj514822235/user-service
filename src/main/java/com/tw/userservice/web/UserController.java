@@ -28,9 +28,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-   // public UserController(UserService userService){
-       // this.userService = userService;
-    //}
+
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
