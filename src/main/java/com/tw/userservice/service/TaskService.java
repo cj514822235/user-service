@@ -33,7 +33,7 @@ public class TaskService {
 
         tasks.forEach(task -> {
             task.setStatus(true);
-            task.setUser(user);
+            task.setUserId(user.getId());
         });
         taskRepository.saveAll(tasks);
         return userId;

@@ -7,6 +7,7 @@ import com.tw.userservice.modle.User;
 import com.tw.userservice.modle.UserDetails;
 import com.tw.userservice.repository.TaskRepository;
 import com.tw.userservice.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-
+@Slf4j
 @Service
 public class UserService {
 
@@ -44,6 +45,7 @@ public class UserService {
     public UserDetails findByUserId(String userId){
         User user =  Optional.ofNullable(userRepository.findUserByUserId(userId))
                 .orElseThrow(()->new UserNotFoundException("User Not Found"));
+        log.error("User Not Found" + userId);
         if(user.getStatus()) {
             return UserDetails.builder()
                     .userId(user.getUserId())
@@ -86,7 +88,7 @@ public class UserService {
 
     public void updateUserInfo(String userId, ChangeUserInfo changeUserInfo) {
         User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
-                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+                .orElseThrow(()->new UserNotFoundException("User Not Found")); //todo add userInfo,add log
         if(user.getStatus()) {
             if (changeUserInfo.getAge() != null) {
                 user.setAge(changeUserInfo.getAge());
@@ -107,7 +109,7 @@ public class UserService {
 
     public String deleteUserInfo(String userId) {
         User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
-                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+                .orElseThrow(()->new UserNotFoundException(USER_NOT_FOUND));
         if(user.getStatus()) {
             user.setStatus(false);
 

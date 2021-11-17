@@ -41,9 +41,10 @@ public class Task extends EntityBase {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+//    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
+//    @JoinColumn(name = "user_id", referencedColumnName = "id")
+//    @JsonIgnore
     @JsonIgnore
-    private User user;
+    private Long userId; //todo userId
 
 }
