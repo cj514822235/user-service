@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, String> {
     List<Task> findTasksByUserId(Long userId);
+    Task findTaskById(Long id);
 
     List<Task> findTasksByLevel(Level level);
 
