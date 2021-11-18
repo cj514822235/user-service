@@ -43,7 +43,7 @@ public class UserServiceTest {
                 .name("小红")
                 .cellphone("15228829245")
                 .status(true)
-                .role("user")
+                .role("admin")
                 .email("514822235@qq.com")
                 .age(10)
                 .address("陕西省西安市")

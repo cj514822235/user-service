@@ -16,6 +16,14 @@ import java.util.Set;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<ErrorResult> handle(AuthorizationException ex){
+        ErrorResult errorResult = new ErrorResult(401,HttpStatus.UNAUTHORIZED, ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResult);
+
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResult> handle(UserNotFoundException ex) {
         ErrorResult errorResult = new ErrorResult(404, HttpStatus.NOT_FOUND, ex.getMessage());

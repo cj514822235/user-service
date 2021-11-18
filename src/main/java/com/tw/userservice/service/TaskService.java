@@ -91,4 +91,9 @@ public class TaskService {
         }
         throw new UserNotFoundException("User Not found");
     }
+
+    public List<Task> getAllTasks() {
+
+        return taskRepository.findAll();
+    }
 }
