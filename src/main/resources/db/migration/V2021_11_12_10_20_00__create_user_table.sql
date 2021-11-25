@@ -1,6 +1,6 @@
 CREATE TABLE `user_table` (
-  `id`          int(11)     NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `user_id`     varchar(36) NOT NULL ,
+  `id`          int(11)     NOT NULL AUTO_INCREMENT ,
+  `user_id`     varchar(36) NOT NULL PRIMARY KEY,
   `status`      boolean     NOT NULL ,
   `role`        varchar(36) NOT NULL ,
   `age`         int         NOT NULL ,
@@ -10,8 +10,8 @@ CREATE TABLE `user_table` (
   `email`       varchar(36) NOT NULL,
   `created_at`      datetime    NOT NULL,
   `updated_at`      datetime    NOT NULL,
-  `version`         int(11)     NOT NULL
-
+  `version`         int(11)     NOT NULL,
+   INDEX(id)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;

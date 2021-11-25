@@ -1,11 +1,13 @@
-package com.tw.userservice;
+package com.tw.userservice.service;
 
 import com.tw.userservice.exception.UserNotFoundException;
-import com.tw.userservice.modle.User;
-import com.tw.userservice.modle.UserDetails;
+import com.tw.userservice.model.ChangeUserInfo;
+import com.tw.userservice.model.Level;
+import com.tw.userservice.model.Task;
+import com.tw.userservice.model.User;
+import com.tw.userservice.model.UserDetails;
 import com.tw.userservice.repository.TaskRepository;
 import com.tw.userservice.repository.UserRepository;
-import com.tw.userservice.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ public class UserServiceTest {
     private TaskRepository taskRepository;
     private User user;
     private User user1;
+    private Task task;
 
     @BeforeEach
     void setUp() {
@@ -60,6 +63,14 @@ public class UserServiceTest {
                 .cellphone("12345678")
                 .address("山西省太原市")
                 .build();
+       task= Task.builder()
+               .id(1L)
+               .status(true)
+               .description("add task")
+               .level(Level.EASY)
+               .userId(user.getUserId())
+               .build();
+
 
     }
     @Test
@@ -89,11 +100,10 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.findUserByUserId("1234567891011")).thenReturn(user);
 
-      // UserDetails userDetails = userService.findByUserId("1234567891011");
 
-        UserNotFoundException userNotFoundException= Assertions.assertThrows(UserNotFoundException.class, () -> {
-            userService.findByUserId("1234567891012");
-        });
+        UserNotFoundException userNotFoundException= Assertions.assertThrows(UserNotFoundException.class, () ->
+            userService.findByUserId("1234567891012")
+        );
 
         Assertions.assertTrue(userNotFoundException.getMessage().contains("User Not Found"));
     }
@@ -103,7 +113,6 @@ public class UserServiceTest {
         List<User> userList = new ArrayList<>();
         userList.add(user);
         userList.add(user1);
-
         Mockito.when(userRepository.findAll()).thenReturn(userList);
 
         List<UserDetails> userDetailsList = userService.findAllUsers();
@@ -114,18 +123,47 @@ public class UserServiceTest {
     }
     @Test
     public void should_return_right_user_and_task_status_when_delete_user(){
-        User deletionUser = User.builder()
-                .id(1L)
-                .userId("1234567891011")
-                .name("小红")
-                .cellphone("15228829245")
-                .status(false)
-                .role("user")
-                .email("514822235@qq.com")
-                .age(10)
-                .address("陕西省西安市")
+     List<Task> tasks = new ArrayList<>();
+     tasks.add(task);
+     Mockito.when(userRepository.findUserByUserId("1234567891011")).thenReturn(user);
+     Mockito.when(taskRepository.findTasksByUserId(user.getUserId())).thenReturn(tasks);
+
+
+     String result = userService.deleteUserInfo("1234567891011");
+
+     Assertions.assertEquals("1234567891011",result);
+     Assertions.assertFalse(user.getStatus());
+     Assertions.assertFalse(task.getStatus());
+    }
+
+    @Test
+    public void should_return_right_user_info_when_update_user_info(){
+        ChangeUserInfo changeUserInfo = ChangeUserInfo.builder()
+                .address("上海虹桥")
+                .age(100)
+                .email("1234@qq.com")
+                .cellphone("123456")
                 .build();
-     //   Mockito.when()
+        Mockito.when(userRepository.findUserByUserId("1234567891011")).thenReturn(user);
+
+        String updateUser = userService.updateUserInfo("1234567891011",changeUserInfo);
+
+        Assertions.assertEquals("1234567891011",updateUser );
+        Assertions.assertEquals(user.getAge(),changeUserInfo.getAge());
+        Assertions.assertEquals(user.getCellphone(),changeUserInfo.getCellphone());
+
+
+    }
+
+    @Test
+    public void should_return_right_user_status_when_delete_user(){
+        Mockito.when(userRepository.findUserByUserId("1234567891011")).thenReturn(user);
+
+        String deleteUser = userService.deleteUserInfo("1234567891011");
+
+        Assertions.assertEquals("1234567891011",deleteUser);
+
+        Assertions.assertFalse(user.getStatus());
 
     }
 

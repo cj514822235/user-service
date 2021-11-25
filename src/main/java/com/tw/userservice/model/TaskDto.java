@@ -1,14 +1,22 @@
-package com.tw.userservice.modle;
+package com.tw.userservice.model;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetTasksLevel {
-    private Level level;
+public class TaskDto  {
+
+    private String userId;
+
+    private List<Task> tasks;
+
 }

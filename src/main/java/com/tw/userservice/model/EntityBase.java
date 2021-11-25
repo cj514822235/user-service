@@ -1,12 +1,14 @@
-package com.tw.userservice.modle;
+package com.tw.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedBy;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -23,12 +25,12 @@ import java.time.Instant;
 public abstract class EntityBase {
     public static final String SKIP_DELETED_CLAUSE = "deleted = false";
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(updatable = false)
     @JsonIgnore
     private Instant createdAt;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     @JsonIgnore
     private Instant updatedAt;
 

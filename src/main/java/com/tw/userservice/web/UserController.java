@@ -2,15 +2,16 @@ package com.tw.userservice.web;
 
 import com.tw.userservice.exception.AuthorizationException;
 import com.tw.userservice.exception.UserNotFoundException;
-import com.tw.userservice.modle.ChangeUserInfo;
+import com.tw.userservice.model.ChangeUserInfo;
 
-import com.tw.userservice.modle.User;
-import com.tw.userservice.modle.UserDetails;
-import com.tw.userservice.modle.UserInfo;
+import com.tw.userservice.model.User;
+import com.tw.userservice.model.UserDetails;
+import com.tw.userservice.model.UserInfo;
 import com.tw.userservice.service.Header;
 import com.tw.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
-
 public class UserController {
 
     @Autowired
@@ -56,16 +56,16 @@ public class UserController {
 
 
     @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public UserDetails findByUserId(@PathVariable(value = "userId") String userId) {
-
-        return userService.findByUserId(userId);
+    public UserDetails findByUserId(@RequestHeader(value = "token") String token, @PathVariable(value = "userId") String userId) {
+        if(authorization.authorize(token,userId)||authorization.authorizeIsAdmin(token)) {
+            return userService.findByUserId(userId);
+        }
+        throw new AuthorizationException("Token Error");
     }
 
     @GetMapping()
     public List<UserDetails> findAllUsers(@RequestHeader(value = "token") String token) {
-        if (authorization.getAuthorization(Optional.ofNullable(header.parsingToken(token))
-                .orElseThrow(()->new UserNotFoundException("token mistake")))) {
+        if (authorization.authorizeIsAdmin(token)) {
             return userService.findAllUsers();
         }
         throw new AuthorizationException("USER " + header.parsingToken(token) + " NO AUTHORIZATION");
@@ -73,15 +73,21 @@ public class UserController {
 
 
     @PutMapping("/{userId}")
-    public void updateUserInfo(@PathVariable(value = "userId") String userId,
+    public String updateUserInfo(@RequestHeader(value = "token")String token ,@PathVariable(value = "userId") String userId,
                                @RequestBody ChangeUserInfo changeUserInfo) {
-
-        userService.updateUserInfo(userId, changeUserInfo);
+        if (authorization.authorize(token,userId)) {
+            return  userService.updateUserInfo(userId, changeUserInfo);
+        }
+        throw new AuthorizationException("Token Error");
     }
 
     @DeleteMapping("/{userId}")
-    public String deleteUserInfo(@PathVariable(value = "userId") String userId) {
-        return userService.deleteUserInfo(userId);
+    public String deleteUserInfo(@RequestHeader(value = "token")String token , @PathVariable(value = "userId") String userId) {
+
+        if (authorization.authorize(token,userId)||authorization.authorizeIsAdmin(token)) {
+            return userService.deleteUserInfo(userId);
+        }
+        throw new AuthorizationException("Token Error");
     }
 }
 

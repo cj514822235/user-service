@@ -1,4 +1,4 @@
-package com.tw.userservice.modle;
+package com.tw.userservice.model;
 
 
 import lombok.AllArgsConstructor;
@@ -6,24 +6,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDetails {
+public class ChangeUserInfo extends EntityBase {
 
-    private String userId;
-
-    private String name;
-
-    private int age;
+    private Integer age;
 
     private String cellphone;
 
     private String address;
 
     private String email;
+
+
 }

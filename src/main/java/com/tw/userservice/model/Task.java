@@ -1,4 +1,4 @@
-package com.tw.userservice.modle;
+package com.tw.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -14,8 +13,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -41,10 +38,7 @@ public class Task extends EntityBase {
     @Column(name = "description")
     private String description;
 
-//    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
-//    @JoinColumn(name = "user_id", referencedColumnName = "id")
-//    @JsonIgnore
-    @JsonIgnore
-    private Long userId; //todo userId
+
+    private String userId; //todo userId
 
 }

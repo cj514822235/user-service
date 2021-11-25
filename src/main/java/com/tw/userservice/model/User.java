@@ -1,4 +1,4 @@
-package com.tw.userservice.modle;
+package com.tw.userservice.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,19 +8,17 @@ import lombok.Builder;
 import lombok.Data;
 
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import javax.persistence.Table;
-import java.time.Instant;
 
 
 @Entity
@@ -30,15 +28,15 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 public class User extends EntityBase {
-    @Id
+
     @Column(name = "id", nullable = false)
     @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "user_id")
+    @Id
     private String userId;
-
     @Column(name = "status")
     private Boolean status;
 

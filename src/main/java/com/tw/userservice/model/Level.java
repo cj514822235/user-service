@@ -1,4 +1,4 @@
-package com.tw.userservice.modle;
+package com.tw.userservice.model;
 
 
 

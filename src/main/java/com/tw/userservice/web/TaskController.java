@@ -1,9 +1,10 @@
 package com.tw.userservice.web;
 
 import com.tw.userservice.exception.AuthorizationException;
-import com.tw.userservice.modle.GetTasksLevel;
-import com.tw.userservice.modle.Task;
-import com.tw.userservice.modle.TaskDto;
+
+import com.tw.userservice.model.ShareTask;
+import com.tw.userservice.model.Task;
+import com.tw.userservice.model.TaskDto;
 import com.tw.userservice.service.Header;
 import com.tw.userservice.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,50 +38,49 @@ public class TaskController {
     @Autowired
     Header header;
 
-
     @PostMapping()
     public String createTasks(@RequestBody TaskDto dto){
-
        return taskService.createTasks(dto.getUserId(),dto.getTasks());
-
     }
+
 
     @GetMapping()
-    public List<Task> getTasksForUser(@RequestParam(value = "userId") String userId){
+    public List<Task> getTask(@RequestHeader(value = "token") String token,
+                              @RequestParam(value = "userId",required = false) String userId,
+                              @RequestParam(value = "level",required = false) String level){
 
-
-        return taskService.getTasksForUser(userId);
+        if(authorization.authorizeIsAdmin(token)||authorization.authorize(token,userId)){
+            return taskService.getTasks(userId,level);
+        }
+        throw new AuthorizationException("No Authorization");
     }
 
-    @GetMapping("all-task")
-    public List<Task> getAllTasks(@RequestHeader(value = "token") String token){
-        if(authorization.getAuthorization(header.parsingToken(token))){
-            return taskService.getAllTasks();
+    @GetMapping("/{id}")
+    public Task getTaskById(@RequestHeader(value = "token")String token, @PathVariable(value = "id") Long id ){
+
+        if(authorization.authorizeIsAdmin(token)||authorization.authorize(token,id)){
+            return taskService.getTask(id);
+        }
+        throw new AuthorizationException("No Authorization");
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteAnyTask(@RequestHeader(value = "token") String token,@PathVariable(value = "id")Long id){
+
+        if(authorization.authorizeIsAdmin(token)||authorization.authorize(token,id)){
+            return taskService.deleteTask(id);
         }
         throw new AuthorizationException("USER " + header.parsingToken(token)+ " NO AUTHORIZATION");
     }
 
+    @PostMapping("/share")
+    public String shareTask(@RequestHeader(value = "token") String token, @RequestBody ShareTask shareTask){
+        if(authorization.authorizeIsAdmin(token)||authorization.authorize(token,shareTask.getTaskId(),shareTask.getUserId())){
+            return taskService.shareTask(shareTask);
 
-    @GetMapping("task-level")
-    public List<Task> getTaskByStatus(@RequestParam(value = "userId") String userId,@RequestBody GetTasksLevel level){
-
-        return taskService.getTasksByStatus(userId,level);
-    }
-
-    @DeleteMapping("{id}")
-    public String deleteTaskById(@RequestHeader(value = "token") String token,@PathVariable(value = "id")Long id){
-
-        return taskService.deleteTaskById(header.parsingToken(token),id);
-    }
-
-    @DeleteMapping()
-    public String deleteAnyTask(@RequestHeader(value = "token") String token,@RequestBody Long id){
-        if(authorization.getAuthorization(header.parsingToken(token))){
-            return taskService.deleteAnyTask(id);
         }
-        throw new AuthorizationException("USER " + header.parsingToken(token)+ " NO AUTHORIZATION");
+        throw new AuthorizationException("No Authorization");
     }
-
 
 
 }
