@@ -1,7 +1,6 @@
 package com.tw.userservice.service;
 
-import com.tw.userservice.model.Level;
-import com.tw.userservice.model.Request;
+import com.tw.userservice.model.Criteria;
 import com.tw.userservice.model.Task;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -14,9 +13,9 @@ import java.util.List;
 
 public class TaskSpecification implements Specification<Task> {
 
-    private final Request request;
+    private final Criteria request;
 
-    public TaskSpecification(Request request) {
+    public TaskSpecification(Criteria request) {
         this.request = request;
     }
 
@@ -34,9 +33,9 @@ public class TaskSpecification implements Specification<Task> {
         if(request.getLevel()!=null) {
             list.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
         }
-      //  list.add(criteriaBuilder.equal(root.get("description"),"创建数据库"));
+
         Predicate[] arr = new Predicate[list.size()];
         return criteriaBuilder.and(list.toArray(arr));
-       // Predicate pre = criteriaBuilder.equal(root.get("userId"),"0319349339968");
+
     }
 }

@@ -2,7 +2,9 @@ package com.tw.userservice.service;
 
 import com.tw.userservice.exception.TaskNotFoundException;
 import com.tw.userservice.model.Level;
-import com.tw.userservice.model.Request;
+import com.tw.userservice.model.Criteria;
+import com.tw.userservice.model.ModifyTaskInfo;
+import com.tw.userservice.model.ShareTask;
 import com.tw.userservice.model.Task;
 import com.tw.userservice.model.User;
 import com.tw.userservice.repository.TaskRepository;
@@ -21,6 +23,8 @@ import org.mockito.quality.Strictness;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class TaskServiceTest {
@@ -31,6 +35,9 @@ public class TaskServiceTest {
     private UserRepository userRepository;
     @Mock
     private TaskRepository taskRepository;
+
+
+
 
     private User user;
     private Task firstTask;
@@ -128,14 +135,13 @@ public class TaskServiceTest {
     @Test
     public void should_return_right_request(){
 
-        Mockito.when(userRepository.findUserByUserId("1234567891011")).thenReturn(user);
 
-       Request request = taskService.getRequest("1234567891011","EASY");
+       Criteria request = taskService.getCriteria("1234567891011","EASY");
 
        Assertions.assertEquals(request.getUserId(),user.getUserId());
        Assertions.assertEquals(request.getLevel(),Level.EASY);
-
     }
+
     @Test
     public void should_return_right_task_when_user_get_task(){
         Mockito.when(taskRepository.findTaskById(1L)).thenReturn(firstTask);
@@ -203,6 +209,44 @@ public class TaskServiceTest {
 
         Assertions.assertEquals("successfully delete",result);
         Assertions.assertFalse(firstTask.getStatus());
+    }
+
+    @Test
+    public void should_return_right_task_id_when_sharing_task(){
+        ShareTask shareTask = ShareTask.builder()
+                .taskId(1L)
+                .userId("1234567891011")
+                .build();
+
+        Mockito.when(taskRepository.findTaskById(shareTask.getTaskId())).thenReturn(firstTask);
+
+        Long taskId = taskService.shareTask(shareTask);
+
+        Assertions.assertNull(taskId);
+
+    }
+
+    @Test
+    public void should_return_right_task_id_when_modify_task(){
+        ModifyTaskInfo modifyTaskInfo = ModifyTaskInfo.builder().description("modifyTask").build();
+
+        Mockito.when(taskRepository.findTaskById(1L)).thenReturn(firstTask);
+
+        Long taskId = taskService.modifyTask(1L,modifyTaskInfo);
+
+        Assertions.assertEquals(1L,taskId);
+
+    }
+    @Test
+    public void should_throw_exception_when_task_id_not_exist(){
+        ModifyTaskInfo modifyTaskInfo = ModifyTaskInfo.builder().description("modifyTask").build();
+
+        Mockito.when(taskRepository.findTaskById(1L)).thenReturn(firstTask);
+
+        TaskNotFoundException taskNotFoundException = Assertions.assertThrows(TaskNotFoundException.class,
+
+                ()-> taskService.modifyTask(2L,modifyTaskInfo));
+        Assertions.assertTrue(taskNotFoundException.getMessage().contains("Task Not Found"));
     }
 
 

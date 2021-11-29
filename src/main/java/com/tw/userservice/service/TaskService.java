@@ -1,10 +1,12 @@
 package com.tw.userservice.service;
 
 
+import com.tw.userservice.exception.BadRequest;
 import com.tw.userservice.exception.TaskNotFoundException;
 import com.tw.userservice.exception.UserNotFoundException;
 import com.tw.userservice.model.Level;
-import com.tw.userservice.model.Request;
+import com.tw.userservice.model.ModifyTaskInfo;
+import com.tw.userservice.model.Criteria;
 import com.tw.userservice.model.ShareTask;
 import com.tw.userservice.model.Task;
 import com.tw.userservice.model.User;
@@ -53,7 +55,6 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-
     public String deleteTask(Long id) {
         Task task = Optional.ofNullable(taskRepository.
                         findTaskById(id)).
@@ -68,22 +69,22 @@ public class TaskService {
 
     public List<Task> getTasks(String userId, String level) {
 
-        Request request = getRequest(userId, level);
+        Criteria criteria = getCriteria(userId, level);
 
-        TaskSpecification taskSpecification = new TaskSpecification(request);
+        TaskSpecification taskSpecification = new TaskSpecification(criteria);
 
         return taskRepository.findAll(taskSpecification);
     }
 
-    public Request getRequest(String userId, String level) {
-        User user = Optional.ofNullable(userRepository.findUserByUserId(userId)).orElse(new User());
+    public Criteria getCriteria(String userId, String level) {
+
         if (level == null) {
-            return Request.builder()
-                    .UserId(user.getUserId())
+            return Criteria.builder()
+                    .UserId(userId)
                     .build();
         }
-        return Request.builder()
-                .UserId(user.getUserId())
+        return Criteria.builder()
+                .UserId(userId)
                 .level(Level.valueOf(level))
                 .build();
     }
@@ -95,14 +96,14 @@ public class TaskService {
     }
 
 
-    public String shareTask(ShareTask shareTask) {
+    public Long shareTask(ShareTask shareTask) {
         Task task = Optional.ofNullable(taskRepository.findTaskById(shareTask.getTaskId()))
                 .filter(task1 -> task1.getStatus().equals(true))
                 .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
 
         taskRepository.findTasksByUserId(shareTask.getUserId()).forEach(task1 -> {
             if(task1.getLevel().equals(task.getLevel())&&task1.getDescription().equals(task.getDescription())){
-                throw new TaskNotFoundException("Task already exist");
+                throw new BadRequest("Task already exist");
             }
         });
 
@@ -113,6 +114,17 @@ public class TaskService {
                 .level(task.getLevel())
                 .build();
         taskRepository.save(newTask);
-        return "successful share";
+        return newTask.getId();
+    }
+
+    public Long modifyTask(Long id, ModifyTaskInfo modifyTaskInfo) {
+        Task task = Optional.ofNullable(taskRepository.findTaskById(id))
+                .filter(task1 -> task1.getStatus().equals(true)).orElseThrow(()->new TaskNotFoundException("Task Not Found"));
+        if(task.getDescription().equals(modifyTaskInfo.getDescription())){
+            throw new TaskNotFoundException("The modifications are the same.");
+        }
+        task.setDescription(modifyTaskInfo.getDescription());
+        taskRepository.save(task);
+        return task.getId();
     }
 }

@@ -57,7 +57,7 @@ public class UserService {
         User user =  Optional.ofNullable(userRepository.findUserByUserId(userId))
                 .orElseThrow(()->{ log.error("User "+userId+"  Not Found");
                        throw  new UserNotFoundException("User Not Found");});
-       // log.error("User Not Found " + userId);
+
         if(user.getStatus()) {
             return UserDetails.builder()
                     .userId(user.getUserId())
@@ -125,7 +125,7 @@ public class UserService {
     }
 
     private User getUser(String userId) {
-        return (User) Optional.ofNullable(userRepository.findUserByUserId(userId))
+        return  Optional.ofNullable(userRepository.findUserByUserId(userId))
                     .orElseThrow(()->{log.error("User "+userId+" Not Found");
                        throw  new UserNotFoundException("User"+userId+" Not Found");});
     }

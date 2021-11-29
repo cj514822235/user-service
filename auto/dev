@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd $(dirname ${BASH_SOURCE[0]})/..
+
+DEFAULT_CMD=(java -jar user-service.jar)
+
+docker-compose down --remove-orphans
+docker-compose run --rm --use-aliases --service-ports dev "${@-${DEFAULT_CMD[@]}}"

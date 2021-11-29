@@ -23,6 +23,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResult);
 
     }
+    @ExceptionHandler(BadRequest.class)
+    public ResponseEntity<ErrorResult> handle(BadRequest ex) {
+        ErrorResult errorResult = new ErrorResult(400, HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResult);
+    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResult> handle(UserNotFoundException ex) {

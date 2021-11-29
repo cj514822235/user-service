@@ -3,6 +3,8 @@ package com.tw.userservice.controller;
 
 import com.google.gson.Gson;
 import com.tw.userservice.model.Level;
+import com.tw.userservice.model.ModifyTaskInfo;
+import com.tw.userservice.model.ShareTask;
 import com.tw.userservice.model.Task;
 import com.tw.userservice.model.TaskDto;
 import com.tw.userservice.model.User;
@@ -49,7 +51,10 @@ public class TaskControllerTest {
     private TaskDto taskDto;
 
     @Autowired
-    private JacksonTester<TaskDto> taskDtoJacksonTester;
+    JacksonTester<ShareTask> shareTaskJacksonTester;
+
+    @Autowired
+    JacksonTester<ModifyTaskInfo> modifyTaskInfoJacksonTester;
 
     private Task firstTask;
 
@@ -105,8 +110,9 @@ public class TaskControllerTest {
         String json = gson.toJson(taskDto);
 
         Mockito.when(taskService.createTasks("1234567891011", taskDto.getTasks())).thenReturn("1234567891011");
-
+        Mockito.when(authorization.authorize("MTIzNDU2Nzg5MTAxMQ==", "1234567891011")).thenReturn(true);
         mockMvc.perform(MockMvcRequestBuilders.post("/tasks")
+                        .header("token","MTIzNDU2Nzg5MTAxMQ==")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
@@ -234,6 +240,83 @@ public class TaskControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message", is("No Authorization")));
     }
+    @Test
+    public void should_return_task_id_when_sharing_task() throws Exception{
+        ShareTask shareTask = ShareTask.builder()
+                .taskId(1L)
+                .userId("1234567891011")
+                .build();
 
+       // JacksonTester<ShareTask> shareTaskJacksonTester = null;
+
+        Mockito.when(taskService.shareTask(shareTask)).thenReturn(2L);
+        Mockito.when(authorization.authorize("MTIzNDU2Nzg5MTAxMQ==", 1L,"1234567891011")).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.post("/tasks/sharing")
+                        .header("token", "MTIzNDU2Nzg5MTAxMQ==")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(shareTaskJacksonTester.write(shareTask).getJson())
+
+
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("2")));
+    }
+
+
+    @Test
+    public void should_throw_exception_when_sharing_task_token_error() throws Exception{
+        ShareTask shareTask = ShareTask.builder()
+                .taskId(1L)
+                .userId("1234567891011")
+                .build();
+
+
+        Mockito.when(taskService.shareTask(shareTask)).thenReturn(2L);
+        Mockito.when(authorization.authorize("MTIzNDU2Nzg5MTAxMQ==", 1L)).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.post("/tasks/sharing")
+                        .header("token", "MTIzNDU2Nzg5MTAxM==")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(shareTaskJacksonTester.write(shareTask).getJson())
+
+
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message", is("No Authorization")));
+    }
+    @Test
+    public void should_return_right_task_id_when_modify_task() throws Exception{
+        ModifyTaskInfo modifyTaskInfo = ModifyTaskInfo.builder().description("modifyTask").build();
+
+        Mockito.when(taskService.modifyTask(1L,modifyTaskInfo)).thenReturn(1L);
+        Mockito.when(authorization.authorize("MTIzNDU2Nzg5MTAxMQ==", 1L)).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.put("/tasks/{id}",1L)
+                        .header("token", "MTIzNDU2Nzg5MTAxMQ==")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(modifyTaskInfoJacksonTester.write(modifyTaskInfo).getJson())
+
+
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("1")));
+    }
+
+
+    @Test
+    public void should_throw_exception_when_modify_task_token_error() throws Exception{
+       ModifyTaskInfo modifyTaskInfo = ModifyTaskInfo.builder().description("modifyTask").build();
+
+        Mockito.when(taskService.modifyTask(1L,modifyTaskInfo)).thenReturn(1L);
+        Mockito.when(authorization.authorize("MTIzNDU2Nzg5MTAxMQ==", 1L,"1234567891011")).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.put("/tasks/{id}",1L)
+
+                        .header("token", "MTIzNDU2Nzg5MTAxM==")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(modifyTaskInfoJacksonTester.write(modifyTaskInfo).getJson())
+
+
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message", is("No Authorization")));
+    }
 
 }

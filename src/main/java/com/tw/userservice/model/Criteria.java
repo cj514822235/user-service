@@ -7,9 +7,8 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class Request {
+public class Criteria {
 
-  // private Long Id;
    private String UserId;
    private Level level;
 }

@@ -2,7 +2,7 @@ package com.tw.userservice.repository;
 
 
 import com.tw.userservice.model.Level;
-import com.tw.userservice.model.Request;
+import com.tw.userservice.model.Criteria;
 import com.tw.userservice.model.Task;
 import com.tw.userservice.model.User;
 import com.tw.userservice.service.TaskSpecification;
@@ -96,7 +96,7 @@ public class TaskRepositoryTest {
 
     @Test
     public void should_return_tasks_bu_different_conditions(){
-        Request request = new Request("1234567891011",Level.HARD);
+        Criteria request = new Criteria("1234567891011",Level.HARD);
         TaskSpecification taskSpecification = new TaskSpecification(request);
 
         List<Task> result = taskRepository.findAll(taskSpecification);
