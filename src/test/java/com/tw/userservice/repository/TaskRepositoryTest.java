@@ -5,7 +5,7 @@ import com.tw.userservice.model.Level;
 import com.tw.userservice.model.Criteria;
 import com.tw.userservice.model.Task;
 import com.tw.userservice.model.User;
-import com.tw.userservice.service.TaskSpecification;
+import com.tw.userservice.utils.TaskSpecification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

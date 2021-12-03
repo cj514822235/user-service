@@ -7,8 +7,9 @@ import com.tw.userservice.model.ChangeUserInfo;
 import com.tw.userservice.model.User;
 import com.tw.userservice.model.UserDetails;
 import com.tw.userservice.model.UserInfo;
-import com.tw.userservice.service.Header;
 import com.tw.userservice.service.UserService;
+import com.tw.userservice.utils.Authorization;
+import com.tw.userservice.utils.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 

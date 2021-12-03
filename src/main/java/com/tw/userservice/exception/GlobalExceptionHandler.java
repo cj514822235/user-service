@@ -28,6 +28,18 @@ public class GlobalExceptionHandler {
         ErrorResult errorResult = new ErrorResult(400, HttpStatus.BAD_REQUEST, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResult);
     }
+    @ExceptionHandler(TaskRepetitionException.class)
+    public ResponseEntity<ErrorResult> handle(TaskRepetitionException ex) {
+        ErrorResult errorResult = new ErrorResult(200, HttpStatus.OK, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CREATED).body(errorResult);
+    }
+
+    @ExceptionHandler(UserRepetitionException.class)
+    public ResponseEntity<ErrorResult> handle(UserRepetitionException ex) {
+        ErrorResult errorResult = new ErrorResult(200, HttpStatus.OK, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CREATED).body(errorResult);
+    }
+
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResult> handle(UserNotFoundException ex) {

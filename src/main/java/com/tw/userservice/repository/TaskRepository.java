@@ -1,6 +1,6 @@
 package com.tw.userservice.repository;
 
-import com.tw.userservice.model.Level;
+
 import com.tw.userservice.model.Task;
 
 import org.springframework.data.jpa.repository.JpaRepository;

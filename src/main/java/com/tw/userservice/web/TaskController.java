@@ -6,9 +6,11 @@ import com.tw.userservice.model.ModifyTaskInfo;
 import com.tw.userservice.model.ShareTask;
 import com.tw.userservice.model.Task;
 import com.tw.userservice.model.TaskDto;
-import com.tw.userservice.service.Header;
 import com.tw.userservice.service.TaskService;
+import com.tw.userservice.utils.Authorization;
+import com.tw.userservice.utils.Header;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 
 import java.util.List;
 
@@ -41,6 +45,7 @@ public class TaskController {
     Header header;
 
     @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public String createTasks(@RequestHeader(value = "token") String token,@RequestBody TaskDto dto){
         if(authorization.authorizeIsAdmin(token)||authorization.authorize(token,dto.getUserId())){
             return taskService.createTasks(dto.getUserId(),dto.getTasks());
@@ -70,7 +75,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteAnyTask(@RequestHeader(value = "token") String token,@PathVariable(value = "id")Long id){
+    public Long deleteAnyTask(@RequestHeader(value = "token") String token,@PathVariable(value = "id")Long id){
 
         if(authorization.authorizeIsAdmin(token)||authorization.authorize(token,id)){
             return taskService.deleteTask(id);

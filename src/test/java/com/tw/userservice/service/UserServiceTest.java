@@ -105,7 +105,7 @@ public class UserServiceTest {
             userService.findByUserId("1234567891012")
         );
 
-        Assertions.assertTrue(userNotFoundException.getMessage().contains("User Not Found"));
+        Assertions.assertTrue(userNotFoundException.getMessage().contains("User not found"));
     }
 
     @Test

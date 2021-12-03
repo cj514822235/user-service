@@ -1,6 +1,7 @@
 package com.tw.userservice.service;
 
 import com.tw.userservice.exception.UserNotFoundException;
+import com.tw.userservice.exception.UserRepetitionException;
 import com.tw.userservice.model.ChangeUserInfo;
 import com.tw.userservice.model.Task;
 import com.tw.userservice.model.User;
@@ -33,12 +34,7 @@ public class UserService {
     @Autowired
     private  TaskRepository taskRepository;
 
-//    public UserService(UserRepository userRepository, TaskRepository taskRepository) {
-//
-//        this.userRepository = userRepository;
-//        this.taskRepository = taskRepository;
-//
-//    }
+
 
 
     public String createUser(User user) {
@@ -49,14 +45,14 @@ public class UserService {
             userRepository.save(user);
             return userId;
         }
-        throw new UserNotFoundException("The phone number must be unique");
+        throw new UserRepetitionException("The phone number must be unique");
     }
 
 
     public UserDetails findByUserId(String userId){
         User user =  Optional.ofNullable(userRepository.findUserByUserId(userId))
                 .orElseThrow(()->{ log.error("User "+userId+"  Not Found");
-                       throw  new UserNotFoundException("User Not Found");});
+                       throw  new UserNotFoundException();});
 
         if(user.getStatus()) {
             return UserDetails.builder()
@@ -69,7 +65,7 @@ public class UserService {
                     .build();
         }
          log.error("User"+userId+"Not Found");
-         throw new UserNotFoundException(USER_NOT_FOUND);
+         throw new UserNotFoundException();
 
     }
 
@@ -121,13 +117,13 @@ public class UserService {
             return userId;
         }
         log.error("User "+userId+" Not Found");
-        throw new UserNotFoundException(USER_NOT_FOUND);
+        throw new UserNotFoundException();
     }
 
     private User getUser(String userId) {
         return  Optional.ofNullable(userRepository.findUserByUserId(userId))
                     .orElseThrow(()->{log.error("User "+userId+" Not Found");
-                       throw  new UserNotFoundException("User"+userId+" Not Found");});
+                       throw  new UserNotFoundException();});
     }
 
     public String deleteUserInfo(String userId) {
@@ -143,7 +139,7 @@ public class UserService {
             return userId;
         }
         log.error("User "+ userId +" Not Found");
-        throw new UserNotFoundException("User "+ userId +" Not Found");
+        throw new UserNotFoundException();
     }
 
 }

@@ -9,6 +9,7 @@ import com.tw.userservice.model.Task;
 import com.tw.userservice.model.User;
 import com.tw.userservice.repository.TaskRepository;
 import com.tw.userservice.repository.UserRepository;
+import com.tw.userservice.utils.TaskSpecification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,16 +37,12 @@ public class TaskServiceTest {
     @Mock
     private TaskRepository taskRepository;
 
-
-
-
     private User user;
     private Task firstTask;
     private Task secondTask;
 
     @BeforeEach
     void setUp() {
-
          user = User.builder()
                 .id(1L)
                 .userId("1234567891011")
@@ -89,18 +86,6 @@ public class TaskServiceTest {
 
     }
 
-    @Test
-    public void should_return_all_tasks_when_find_all_task(){
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(firstTask);
-        tasks.add(secondTask);
-        Mockito.when(taskRepository.findAll()).thenReturn(tasks);
-
-       List<Task> result = taskService.getAllTasks();
-
-       Assertions.assertEquals(tasks,result);
-
-    }
 
     @Test
     public void should_return_right_status_when_find_by_order_level(){
@@ -205,9 +190,9 @@ public class TaskServiceTest {
         Mockito.when(userRepository.findUserByUserId("1234567891011")).thenReturn(user);
         Mockito.when(taskRepository.findTaskById(1L)).thenReturn(firstTask);
 
-        String result = taskService.deleteTask(1L);
+        Long result = taskService.deleteTask(1L);
 
-        Assertions.assertEquals("successfully delete",result);
+        Assertions.assertEquals(1L,result);
         Assertions.assertFalse(firstTask.getStatus());
     }
 

@@ -1,68 +1,63 @@
 package com.tw.userservice.service;
 
 
-import com.tw.userservice.exception.BadRequest;
 import com.tw.userservice.exception.TaskNotFoundException;
-import com.tw.userservice.exception.UserNotFoundException;
+import com.tw.userservice.exception.TaskRepetitionException;
 import com.tw.userservice.model.Level;
 import com.tw.userservice.model.ModifyTaskInfo;
 import com.tw.userservice.model.Criteria;
 import com.tw.userservice.model.ShareTask;
 import com.tw.userservice.model.Task;
-import com.tw.userservice.model.User;
 import com.tw.userservice.repository.TaskRepository;
-import com.tw.userservice.repository.UserRepository;
+import com.tw.userservice.utils.TaskSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 
 @Slf4j
 @Service
 public class TaskService {
 
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private TaskRepository taskRepository;
 
 
     public String createTasks(String userId, List<Task> tasks) {
-
-        User user = Optional.ofNullable(userRepository.findUserByUserId(userId))
-                .orElseThrow(() -> {
-                    log.error("User " + userId + " Not Found");
-                    throw new UserNotFoundException("User " + userId + " Not Found");
-                });
-        if (user.getStatus()) {
-
-            tasks.forEach(task -> {
-                task.setStatus(true);
-                task.setUserId(user.getUserId());
-            });
+        if(checkTasks(userId, tasks)){
+            tasks.forEach(task -> {task.setStatus(true);task.setUserId(userId);});
             taskRepository.saveAll(tasks);
             return userId;
         }
-        throw new UserNotFoundException("User " + userId + " Not Found");
+        throw new TaskRepetitionException("Task Repetition"); //todo
+    }
+
+    private boolean checkTasks(String userId, List<Task> tasks) {
+     List<Task> list = taskRepository.findTasksByUserId(userId);
+     AtomicReference<Boolean> repeatTask = new AtomicReference<>(true);
+
+     tasks.forEach(task -> list.forEach(task1 -> {
+         if(task1.getDescription().equals(task.getDescription())){
+             repeatTask.set(false);
+         }
+     }));
+     return repeatTask.get();
+
     }
 
 
-    public List<Task> getAllTasks() {
-
-        return taskRepository.findAll();
-    }
-
-    public String deleteTask(Long id) {
+    public Long deleteTask(Long id) {
         Task task = Optional.ofNullable(taskRepository.
                         findTaskById(id)).
                 filter(task1 -> task1.getStatus().equals(true))
                 .orElseThrow(() -> new TaskNotFoundException("Task " + id + " Not Found"));
         task.setStatus(false);
         taskRepository.save(task);
-        return "successfully delete";
+        return id;
 
     }
 
@@ -76,7 +71,7 @@ public class TaskService {
         return taskRepository.findAll(taskSpecification);
     }
 
-    public Criteria getCriteria(String userId, String level) {
+    public Criteria getCriteria(String userId, String level) {//todo
 
         if (level == null) {
             return Criteria.builder()
@@ -103,7 +98,7 @@ public class TaskService {
 
         taskRepository.findTasksByUserId(shareTask.getUserId()).forEach(task1 -> {
             if(task1.getLevel().equals(task.getLevel())&&task1.getDescription().equals(task.getDescription())){
-                throw new BadRequest("Task already exist");
+                throw new TaskRepetitionException("Task already exist");
             }
         });
 
@@ -121,7 +116,7 @@ public class TaskService {
         Task task = Optional.ofNullable(taskRepository.findTaskById(id))
                 .filter(task1 -> task1.getStatus().equals(true)).orElseThrow(()->new TaskNotFoundException("Task Not Found"));
         if(task.getDescription().equals(modifyTaskInfo.getDescription())){
-            throw new TaskNotFoundException("The modifications are the same.");
+            throw new TaskRepetitionException("The modifications are the same.");
         }
         task.setDescription(modifyTaskInfo.getDescription());
         taskRepository.save(task);
